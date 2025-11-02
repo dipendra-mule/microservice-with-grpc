@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/dipendra-mule/microservice-with-grpc/proto/user";
+
+import "google/protobuf/timestamp.proto";
+
+service UserService {
+	rpc CreateUser(CreateUserRequest) returns (UserResponse){};
+	rpc GetUser(GetUserRequest) returns (UserResponse){};
+	rpc Authenticate(AuthRequest) returns (AuthResponse){};
+	rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse){};
+	rpc UpdateUser(UpdateUserRequest) returns (UserResponse){};
+	rpc ListUsers(ListUsersRequest) returns (ListUsersResponse){};
+}
+
+message User {
+	string id = 1;
+	string name = 2;
+	string email = 3;
+	string role = 4;
+	google.protobuf.Timestamp created_at = 5;
+	google.protobuf.Timestamp updated_at = 6;
+}
+
+message CreateUserRequest {
+	string email = 1;
+	string password = 2;
+	string name = 3;
+	string role = 4;
+}
+
+message GetUserRequest {
+	string id = 1;
+}
+
+message AuthRequest {
+	string email = 1;
+	string password = 2;
+}
+
+message ValidateTokenRequest {
+	string token = 1;
+}
+
+message ValidateTokenResponse {
+	bool valid = 1;
+	User user = 2;
+}
+
+message ListUsersRequest {
+	int32 page = 1;
+	int32 limit = 2;
+}
+
+message ListUsersResponse {
+	repeated User users = 1;
+	int32 total = 2;
+	int32 page = 3;
+	int32 limit = 4;
+}
+
+message UserResponse {
+	User user = 1;
+}
