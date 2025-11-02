@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - microservices-net
+
+  user-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.user
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: microservices
+      JWT_SECRET: your-secret-key
+      USER_SERVICE_PORT: 50051
+    ports:
+      - '50051:50051'
+    depends_on:
+      - postgres
+    networks:
+      - microservices-net
+
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.order
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: microservices
+      USER_SERVICE_ADDR: user-service:50051
+      PRODUCT_SERVICE_ADDR: product-service:50053
+      ORDER_SERVICE_PORT: 50052
+    ports:
+      - '50052:50052'
+    depends_on:
+      - postgres
+      - user-service
+      - product-service
+    networks:
+      - microservices-net
+
+  product-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.product
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: microservices
+      PRODUCT_SERVICE_PORT: 50053
+    ports:
+      - '50053:50053'
+    depends_on:
+      - postgres
+    networks:
+      - microservices-net
+
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
+    environment:
+      USER_SERVICE_ADDR: user-service:50051
+      ORDER_SERVICE_ADDR: order-service:50052
+      PRODUCT_SERVICE_ADDR: product-service:50053
+      GATEWAY_PORT: 8080
+    ports:
+      - '8080:8080'
+    depends_on:
+      - user-service
+      - order-service
+      - product-service
+    networks:
+      - microservices-net
+
+volumes:
+  postgres_data:
+
+networks:
+  microservices-net:
+    driver: bridge
+
