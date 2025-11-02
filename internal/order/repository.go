@@ -163,3 +163,25 @@ func (r *Repository) ListOrders(ctx context.Context, userID string, pag, limit i
 
 	return orders, total, nil
 }
+
+// UpdateOrderStatus updates the status of an order
+// and returns the updated order and error
+func (r *Repository) UpdateOrderStatus(ctx context.Context, id, status string) (*order.Order, error) {
+	updateStatusQuery := `
+		UPDATE orders
+		SET status = $1, updated_at = $2
+		WHERE id = $3
+		RETURNING id, user_id, total_amount, status, created_at, updated_at
+	`
+	var o order.Order
+	err := r.db.QueryRowContext(ctx, updateStatusQuery, status, time.Now(), id).Scan(
+		&o.Id, &o.UserId, &o.TotalAmount, &o.Status, &o.CreatedAt, &o.UpdatedAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, ErrOrderNotFound
+		}
+		return nil, fmt.Errorf("failed to update order status: %w", err)
+	}
+	return &o, nil
+}
