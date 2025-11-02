@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package order;
+
+option go_package = "github.com/dipendra-mule/microservice-with-grpc/proto/order";
+
+service OrderService {
+    rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse){};
+    rpc GetOrder(GetOrderRequest) returns (GetOrderResponse){};
+    rpc ListOrder(ListOrderRequest) returns (ListOrderResponse){};
+    rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (OrderResponse){};
+}
+
+message Order {
+    string id = 1;
+    string user_id = 2;
+    repeated OrderItem items = 3;
+    float total_amout = 4;
+    string status = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+    user.User user = 8; // user info from user service
+}
+
+message OrderItem {
+    string product_id = 1;
+    int32 quantity = 2;
+    float price = 3;
+    string product_name = 4;
+}
+
+message CreateOrderRequest {
+    string user_id = 1;
+    repeated OrderItemRequest items = 2;
+}
+
+message OrderItemRequest {
+    string product_id = 1;
+    int32 quantity = 2;
+}
+
+message GetOrderRequest {
+    string id = 1;
+}
+
+message ListOrderRequest {
+    string user_id = 1;
+    int32 page = 2;
+    int32 limit = 3;
+}
+
+message ListOrderResponse {
+    repeated Order orders = 1;
+    int32 total = 2;
+    int32 page = 3;
+    int32 limit = 4;
+}
+
+message UpdateOrderStatusRequest {
+    string order_id = 1;
+    string status = 2;
+}
+
+message OrderResponse {
+    Order order = 1;
+}
