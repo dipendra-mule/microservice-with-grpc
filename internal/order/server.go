@@ -37,7 +37,7 @@ func (s *Server) GetOrder(ctx context.Context, r *order.GetOrderRequest) (*order
 	return &order.OrderResponse{Order: fetchedOrder}, nil
 }
 
-func (s *Server) ListOrders(ctx context.Context, r *order.UpdateOrderStatusRequest) (*order.OrderResponse, error) {
+func (s *Server) UpdateOrderStatus(ctx context.Context, r *order.UpdateOrderStatusRequest) (*order.OrderResponse, error) {
 	updatedOrderStatus, err := s.service.UpdateOrderStatus(ctx, r)
 	if err != nil {
 		if err == ErrOrderNotFound {
