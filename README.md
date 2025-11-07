@@ -1,6 +1,6 @@
 # Microservice with gRPC
 
-A boilerplate Go project demonstrating a simple microservice architecture using gRPC for communication. This repository is ideal for learning or as a starting point for new Go gRPC-based backends.
+A Go project demonstrating a simple microservice architecture using gRPC for communication. This repository is ideal for learning or as a starting point for new Go gRPC-based backends.
 
 ## Features
 
